@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use Database\Seeders\RoleSeeder;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
@@ -13,6 +15,8 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    $this->seed(RoleSeeder::class);
+
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -22,4 +26,11 @@ test('new users can register', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
+
+    $user = User::query()->where('email', 'test@example.com')->firstOrFail();
+
+    $this->assertDatabaseHas('user_roles', [
+        'user_id' => $user->id,
+        'role_id' => 1,
+    ]);
 });

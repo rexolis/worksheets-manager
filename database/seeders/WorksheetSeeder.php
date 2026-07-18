@@ -31,18 +31,17 @@ class WorksheetSeeder extends Seeder
 
         DB::transaction(function () use ($subjectIds, $worksheetClassIds, $authorIds): void {
             $timestamp = now();
-            $worksheetNumber = 1;
             $worksheets = [];
 
             foreach ($subjectIds as $subjectId) {
                 foreach ($worksheetClassIds as $worksheetClassId) {
-                    for ($worksheetCount = 0; $worksheetCount < 10; $worksheetCount++) {
+                    for ($worksheetNumber = 1; $worksheetNumber <= 10; $worksheetNumber++) {
                         $worksheets[] = [
-                            'number' => $worksheetNumber++,
+                            'number' => $worksheetNumber,
                             'subject_id' => $subjectId,
-                            'subtopic' => $worksheetCount % 2 === 0
-                                ? fake()->words(3, true)
-                                : null,
+                            'subtopic' => $worksheetNumber % 2 === 0
+                                ? null
+                                : fake()->words(3, true),
                             'title' => fake()->sentence(5),
                             'worksheet_class_id' => $worksheetClassId,
                             'created_by' => Arr::random($authorIds),
@@ -54,19 +53,8 @@ class WorksheetSeeder extends Seeder
                 }
             }
 
-            DB::table('worksheets')->upsert(
-                $worksheets,
-                ['number'],
-                [
-                    'subject_id',
-                    'subtopic',
-                    'title',
-                    'worksheet_class_id',
-                    'created_by',
-                    'updated_by',
-                    'updated_at',
-                ],
-            );
+            DB::table('worksheets')->delete();
+            DB::table('worksheets')->insert($worksheets);
         });
     }
 }

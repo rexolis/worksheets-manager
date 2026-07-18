@@ -12,7 +12,7 @@ class WorksheetPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**

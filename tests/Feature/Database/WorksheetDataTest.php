@@ -86,10 +86,14 @@ test('it seeds ten worksheets per subject and class using only role two authors'
 
     foreach (Subject::query()->get() as $subject) {
         foreach (WorksheetClass::query()->get() as $worksheetClass) {
-            expect(Worksheet::query()
+            $numbers = Worksheet::query()
                 ->whereBelongsTo($subject)
                 ->whereBelongsTo($worksheetClass)
-                ->count())->toBe(10);
+                ->orderBy('number')
+                ->pluck('number')
+                ->all();
+
+            expect($numbers)->toBe(range(1, 10));
         }
     }
 });

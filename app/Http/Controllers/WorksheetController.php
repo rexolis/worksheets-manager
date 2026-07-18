@@ -27,7 +27,7 @@ class WorksheetController extends Controller
             ->map(fn (WorksheetClass $class) => [
                 'id' => $class->id,
                 'name' => $class->name,
-                'slug' => Str::slug($class->name),
+                'slug' => $class->slug,
                 'subjects' => $class->subjects->map(fn ($subject) => [
                     'id' => $subject->id,
                     'name' => $subject->name,
@@ -93,8 +93,8 @@ class WorksheetController extends Controller
         $this->authorize('viewAny', Worksheet::class);
 
         $class = WorksheetClass::query()
-            ->get()
-            ->first(fn (WorksheetClass $class) => Str::slug($class->name) === $worksheetClass);
+            ->where('slug', $worksheetClass)
+            ->first();
 
         $subjectModel = Subject::query()
             ->get()
@@ -103,6 +103,7 @@ class WorksheetController extends Controller
         if ($class === null || $subjectModel === null) {
             throw new NotFoundHttpException;
         }
+
         $worksheets = Worksheet::query()
             ->whereBelongsTo($class)
             ->whereBelongsTo($subjectModel)
@@ -113,7 +114,7 @@ class WorksheetController extends Controller
             'worksheetClass' => [
                 'id' => $class->id,
                 'name' => $class->name,
-                'slug' => Str::slug($class->name),
+                'slug' => $class->slug,
             ],
             'subject' => [
                 'id' => $subjectModel->id,

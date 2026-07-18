@@ -13,10 +13,11 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
+ * @property string $slug
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name'])]
+#[Fillable(['name', 'slug'])]
 class WorksheetClass extends Model
 {
     /** @use HasFactory<WorksheetClassFactory> */

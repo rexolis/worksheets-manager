@@ -17,16 +17,18 @@ class WorksheetClassSeeder extends Seeder
         DB::table('worksheet_classes')->upsert([
             [
                 'id' => 1,
-                'name' => 'CSE',
+                'name' => 'Civil Service Examination',
+                'slug' => 'cse',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ],
             [
                 'id' => 2,
-                'name' => 'UPCAT',
+                'name' => 'University of the Philippines College Admission Test',
+                'slug' => 'upcat',
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ],
-        ], ['id'], ['name', 'updated_at']);
+        ], ['id'], ['name', 'slug', 'updated_at']);
     }
 }

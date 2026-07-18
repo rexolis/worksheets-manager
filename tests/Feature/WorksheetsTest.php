@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function () {
@@ -8,8 +9,10 @@ test('guests are redirected to the login page', function () {
         ->assertRedirect(route('login'));
 });
 
-test('authenticated users can visit the worksheets index', function () {
-    $user = User::factory()->create();
+test('authenticated admins can visit the worksheets index', function () {
+    $this->seed(RoleSeeder::class);
+
+    $user = User::factory()->admin()->create();
 
     $this->actingAs($user)
         ->get(route('worksheets'))

@@ -26,8 +26,16 @@ test('it seeds worksheet reference data without duplicates', function () {
     $this->assertDatabaseHas('subjects', ['id' => 3, 'name' => 'Science']);
 
     $this->assertDatabaseCount('worksheet_classes', 2);
-    $this->assertDatabaseHas('worksheet_classes', ['id' => 1, 'name' => 'CSE']);
-    $this->assertDatabaseHas('worksheet_classes', ['id' => 2, 'name' => 'UPCAT']);
+    $this->assertDatabaseHas('worksheet_classes', [
+        'id' => 1,
+        'name' => 'Civil Service Examination',
+        'slug' => 'cse',
+    ]);
+    $this->assertDatabaseHas('worksheet_classes', [
+        'id' => 2,
+        'name' => 'University of the Philippines College Admission Test',
+        'slug' => 'upcat',
+    ]);
 });
 
 test('a worksheet belongs to its subject class and creator', function () {

@@ -2,8 +2,10 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { BookCheck, ChevronRight } from '@lucide/vue';
 import { computed } from 'vue';
-import { worksheets } from '@/routes';
-import { subject as worksheetSubject } from '@/routes/worksheets';
+import {
+    showClass as worksheetClassRoute,
+    subject as worksheetSubject,
+} from '@/routes/worksheets';
 
 type SubjectItem = {
     id: number;
@@ -31,7 +33,6 @@ defineOptions({
         breadcrumbs: [
             {
                 title: 'Worksheets',
-                href: worksheets(),
             },
         ],
     },
@@ -73,9 +74,18 @@ defineOptions({
                 class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
                 <div
-                    class="border-b border-sidebar-border/70 px-4 py-3 dark:border-sidebar-border"
+                    class="border-b border-sidebar-border/70 dark:border-sidebar-border"
                 >
-                    <h2 class="font-semibold">{{ worksheetClass.name }}</h2>
+                    <Link
+                        :href="worksheetClassRoute(worksheetClass.slug)"
+                        class="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/50"
+                        prefetch
+                    >
+                        <h2 class="font-semibold">{{ worksheetClass.name }}</h2>
+                        <ChevronRight
+                            class="size-4 shrink-0 text-muted-foreground"
+                        />
+                    </Link>
                 </div>
 
                 <ul

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps } from '@inertiajs/vue3';
 import { BookCheck, ChevronRight } from '@lucide/vue';
-import { worksheets as worksheetsIndex } from '@/routes';
 import {
     showClass as worksheetClassRoute,
     subject as worksheetSubject,
@@ -28,7 +27,6 @@ setLayoutProps({
     breadcrumbs: [
         {
             title: 'Worksheets',
-            href: worksheetsIndex(),
         },
         {
             title: props.worksheetClass.name,

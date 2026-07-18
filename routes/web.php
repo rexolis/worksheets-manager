@@ -10,6 +10,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('worksheets', [WorksheetController::class, 'index'])
         ->name('worksheets');
+    Route::get('worksheets/{worksheetClass}', [WorksheetController::class, 'showClass'])
+        ->name('worksheets.show-class');
     Route::get('worksheets/{worksheetClass}/{subject}', [WorksheetController::class, 'subject'])
         ->name('worksheets.subject');
 });

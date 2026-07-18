@@ -2,7 +2,10 @@
 import { Head, setLayoutProps } from '@inertiajs/vue3';
 import { BookCheck } from '@lucide/vue';
 import { worksheets as worksheetsIndex } from '@/routes';
-import { subject as worksheetSubject } from '@/routes/worksheets';
+import {
+    showClass as worksheetClassRoute,
+    subject as worksheetSubject,
+} from '@/routes/worksheets';
 
 type NamedSlug = {
     id: number;
@@ -30,7 +33,11 @@ setLayoutProps({
             href: worksheetsIndex(),
         },
         {
-            title: `${props.worksheetClass.name} / ${props.subject.name}`,
+            title: props.worksheetClass.name,
+            href: worksheetClassRoute(props.worksheetClass.slug),
+        },
+        {
+            title: props.subject.name,
             href: worksheetSubject({
                 worksheetClass: props.worksheetClass.slug,
                 subject: props.subject.slug,

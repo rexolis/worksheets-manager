@@ -18,6 +18,11 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            worksheetClasses: Array<{
+                id: number;
+                name: string;
+                slug: string;
+            }>;
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

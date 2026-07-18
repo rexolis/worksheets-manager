@@ -88,6 +88,36 @@ class WorksheetController extends Controller
         //
     }
 
+    /**
+     * Display subjects available for the given worksheet class.
+     */
+    public function showClass(string $worksheetClass)
+    {
+        $this->authorize('viewAny', Worksheet::class);
+
+        $class = WorksheetClass::query()
+            ->where('slug', $worksheetClass)
+            ->with(['subjects' => fn ($query) => $query->orderBy('name')])
+            ->first();
+
+        if ($class === null) {
+            throw new NotFoundHttpException;
+        }
+
+        return Inertia::render('Worksheets/Class', [
+            'worksheetClass' => [
+                'id' => $class->id,
+                'name' => $class->name,
+                'slug' => $class->slug,
+            ],
+            'subjects' => $class->subjects->map(fn (Subject $subject) => [
+                'id' => $subject->id,
+                'name' => $subject->name,
+                'slug' => Str::slug($subject->name),
+            ])->values(),
+        ]);
+    }
+
     public function subject($worksheetClass, $subject)
     {
         $this->authorize('viewAny', Worksheet::class);

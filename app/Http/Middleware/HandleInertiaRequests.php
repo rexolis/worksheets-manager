@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\WorksheetClass;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,6 +47,11 @@ class HandleInertiaRequests extends Middleware
                     ]
                     : null,
             ],
+            'worksheetClasses' => fn () => $request->user()?->isAdmin()
+                ? WorksheetClass::query()
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'slug'])
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

@@ -15,10 +15,13 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard, worksheets } from '@/routes';
+import { showClass as worksheetClass } from '@/routes/worksheets';
 import type { NavItem } from '@/types';
 
 const page = usePage();
+const { isCurrentOrParentUrl } = useCurrentUrl();
 
 const mainNavItems = computed((): NavItem[] => {
     const items: NavItem[] = [
@@ -32,8 +35,12 @@ const mainNavItems = computed((): NavItem[] => {
     if (page.props.auth.user?.is_admin) {
         items.push({
             title: 'Worksheets',
-            href: worksheets(),
             icon: BookCheck,
+            isActive: isCurrentOrParentUrl(worksheets()),
+            items: page.props.worksheetClasses.map((worksheetClassItem) => ({
+                title: worksheetClassItem.name,
+                href: worksheetClass(worksheetClassItem.slug),
+            })),
         });
     }
 

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -51,5 +52,22 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'two_factor_confirmed_at' => now(),
         ]);
+    }
+
+    /**
+     * Ensure an admin user can be created
+     * Ensure that roles are seeded before users
+     * Insert user_roles: user_id => $user->id, role_id => 2 (admin)
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            DB::table('user_roles')->insert([
+                'user_id' => $user->id,
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
     }
 }

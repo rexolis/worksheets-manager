@@ -28,6 +28,11 @@ class WorksheetClass extends Model
         return $this->hasMany(Worksheet::class);
     }
 
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany(Subject::class, 'worksheets')

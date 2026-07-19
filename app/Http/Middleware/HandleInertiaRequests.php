@@ -44,14 +44,21 @@ class HandleInertiaRequests extends Middleware
                     ? [
                         ...$request->user()->only(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']),
                         'is_admin' => $request->user()->isAdmin(),
+                        'is_teacher' => $request->user()->isTeacher(),
                     ]
                     : null,
             ],
-            'worksheetClasses' => fn () => $request->user()?->isAdmin()
-                ? WorksheetClass::query()
+            'worksheetClasses' => function () use ($request) {
+                $user = $request->user();
+
+                if ($user === null || (! $user->isAdmin() && ! $user->isTeacher())) {
+                    return [];
+                }
+
+                return WorksheetClass::query()
                     ->orderBy('name')
-                    ->get(['id', 'name', 'slug'])
-                : [],
+                    ->get(['id', 'name', 'slug']);
+            },
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

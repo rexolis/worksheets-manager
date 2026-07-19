@@ -29,6 +29,13 @@ class RoleSeeder extends Seeder
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ],
+            [
+                'id' => 3,
+                'name' => 'Review Master',
+                'slug' => 'teacher',
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ],
         ], ['id'], ['name', 'slug', 'updated_at']);
     }
 }

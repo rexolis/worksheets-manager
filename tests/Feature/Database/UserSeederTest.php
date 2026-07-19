@@ -14,6 +14,6 @@ test('it creates users with valid random role assignments', function () {
     $this->assertDatabaseCount('user_roles', 10);
 
     expect(DB::table('user_roles')->distinct()->count('user_id'))->toBe(10)
-        ->and(DB::table('user_roles')->whereNotIn('role_id', [1, 2])->count())->toBe(0)
+        ->and(DB::table('user_roles')->whereNotIn('role_id', [1, 2, 3])->count())->toBe(0)
         ->and(DB::table('user_roles')->where('role_id', 2)->exists())->toBeTrue();
 });

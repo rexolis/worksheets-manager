@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             WorksheetClassSeeder::class,
             UserSeeder::class,
             WorksheetSeeder::class,
+            SectionSeeder::class,
         ]);
     }
 }

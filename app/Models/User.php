@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -56,12 +57,28 @@ class User extends Authenticatable
         return $this->hasMany(Worksheet::class, 'updated_by');
     }
 
+    public function sections(): BelongsToMany
+    {
+        return $this->belongsToMany(Section::class, 'review_masters')
+            ->withTimestamps();
+    }
+
     public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->hasRole('teacher');
+    }
+
+    protected function hasRole(string $slug): bool
     {
         return DB::table('user_roles')
             ->join('roles', 'roles.id', '=', 'user_roles.role_id')
             ->where('user_roles.user_id', $this->id)
-            ->where('roles.slug', 'admin')
+            ->where('roles.slug', $slug)
             ->exists();
     }
 }

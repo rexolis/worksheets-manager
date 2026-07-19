@@ -70,4 +70,20 @@ class UserFactory extends Factory
             ]);
         });
     }
+
+    /**
+     * Ensure a review master (teacher) user can be created.
+     * Roles must be seeded before users.
+     */
+    public function teacher(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            DB::table('user_roles')->insert([
+                'user_id' => $user->id,
+                'role_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+    }
 }

@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard, sections, worksheets } from '@/routes';
+import { showClass as sectionClass } from '@/routes/sections';
 import { showClass as worksheetClass } from '@/routes/worksheets';
 import type { NavItem } from '@/types';
 
@@ -47,8 +48,12 @@ const mainNavItems = computed((): NavItem[] => {
     if (page.props.auth.user?.is_admin || page.props.auth.user?.is_teacher) {
         items.push({
             title: 'Sections',
-            href: sections(),
             icon: Users,
+            isActive: isCurrentOrParentUrl(sections()),
+            items: page.props.worksheetClasses.map((worksheetClassItem) => ({
+                title: worksheetClassItem.name,
+                href: sectionClass(worksheetClassItem.slug),
+            })),
         });
     }
 

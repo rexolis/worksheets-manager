@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Section;
+use App\Models\User;
+use App\Models\WorksheetClass;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SectionController extends Controller
 {
@@ -16,13 +21,7 @@ class SectionController extends Controller
     {
         $this->authorize('viewAny', Section::class);
 
-        $user = $request->user();
-
-        $sectionsQuery = $user->isAdmin()
-            ? Section::query()
-            : $user->sections();
-
-        $sections = $sectionsQuery
+        $sections = $this->sectionsFor($request)
             ->with('worksheetClass:id,name,slug')
             ->orderBy('date_start')
             ->orderBy('name')
@@ -32,6 +31,53 @@ class SectionController extends Controller
         return Inertia::render('Sections/Index', [
             'sections' => $sections,
         ]);
+    }
+
+    /**
+     * Display sections for the given worksheet class.
+     */
+    public function showClass(Request $request, string $worksheetClass): Response
+    {
+        $this->authorize('viewAny', Section::class);
+
+        $class = WorksheetClass::query()
+            ->where('slug', $worksheetClass)
+            ->first();
+
+        if ($class === null) {
+            throw new NotFoundHttpException;
+        }
+
+        $sections = $this->sectionsFor($request)
+            ->whereBelongsTo($class)
+            ->with('worksheetClass:id,name,slug')
+            ->orderBy('date_start')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Section $section) => $this->sectionPayload($section));
+
+        return Inertia::render('Sections/Class', [
+            'worksheetClass' => [
+                'id' => $class->id,
+                'name' => $class->name,
+                'slug' => $class->slug,
+            ],
+            'sections' => $sections,
+        ]);
+    }
+
+    /**
+     * Determine what sections the user can view.
+     * An admin can view all sections, a teacher can view only their assigned sections.
+     * @return Builder<Section>|BelongsToMany<Section, User>
+     */
+    private function sectionsFor(Request $request): Builder|BelongsToMany
+    {
+        $user = $request->user();
+
+        return $user->isAdmin()
+            ? Section::query()
+            : $user->sections();
     }
 
     /**

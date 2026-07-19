@@ -73,7 +73,7 @@ function formatDate(date: string): string {
             class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
         >
             <div
-                class="grid grid-cols-[1fr_auto] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[1.2fr_1.5fr_auto_auto_auto] dark:border-sidebar-border"
+                class="grid grid-cols-[minmax(0,1fr)_11rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem] dark:border-sidebar-border"
             >
                 <span>Name</span>
                 <span class="hidden sm:block">Class type</span>
@@ -88,7 +88,7 @@ function formatDate(date: string): string {
                 <li
                     v-for="section in sections"
                     :key="section.id"
-                    class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[1.2fr_1.5fr_auto_auto_auto]"
+                    class="grid grid-cols-[minmax(0,1fr)_11rem] gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem]"
                 >
                     <div class="min-w-0">
                         <p class="truncate font-medium">{{ section.name }}</p>
@@ -104,11 +104,11 @@ function formatDate(date: string): string {
                         </p>
                     </div>
                     <span
-                        class="hidden truncate text-muted-foreground sm:block"
+                        class="hidden min-w-0 truncate text-muted-foreground sm:block"
                     >
                         {{ section.worksheet_class.name }}
                     </span>
-                    <span class="font-medium tabular-nums">
+                    <span class="truncate font-medium tabular-nums">
                         {{ section.class_code }}
                     </span>
                     <span

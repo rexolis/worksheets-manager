@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\WorksheetController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('worksheets.show-class');
     Route::get('worksheets/{worksheetClass}/{subject}', [WorksheetController::class, 'subject'])
         ->name('worksheets.subject');
+
+    Route::get('sections', [SectionController::class, 'index'])
+        ->name('sections');
 });
 
 require __DIR__.'/settings.php';

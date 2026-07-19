@@ -18,6 +18,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('sections', [SectionController::class, 'index'])
         ->name('sections');
+    Route::post('sections', [SectionController::class, 'store'])
+        ->name('sections.store');
     Route::get('sections/{worksheetClass}', [SectionController::class, 'showClass'])
         ->name('sections.show-class');
 });

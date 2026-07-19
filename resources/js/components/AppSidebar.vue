@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, BookCheck } from '@lucide/vue';
+import { LayoutGrid, BookCheck, Users } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -16,7 +16,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { dashboard, worksheets } from '@/routes';
+import { dashboard, sections, worksheets } from '@/routes';
 import { showClass as worksheetClass } from '@/routes/worksheets';
 import type { NavItem } from '@/types';
 
@@ -41,6 +41,14 @@ const mainNavItems = computed((): NavItem[] => {
                 title: worksheetClassItem.name,
                 href: worksheetClass(worksheetClassItem.slug),
             })),
+        });
+    }
+
+    if (page.props.auth.user?.is_admin || page.props.auth.user?.is_teacher) {
+        items.push({
+            title: 'Sections',
+            href: sections(),
+            icon: Users,
         });
     }
 

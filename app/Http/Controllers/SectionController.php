@@ -88,6 +88,42 @@ class SectionController extends Controller
     }
 
     /**
+     * Display the given section.
+     */
+    public function show(Request $request, string $worksheetClass, string $section): Response
+    {
+        $class = WorksheetClass::query()
+            ->where('slug', $worksheetClass)
+            ->first();
+
+        if ($class === null) {
+            throw new NotFoundHttpException;
+        }
+
+        $sectionModel = $this->sectionsFor($request)
+            ->whereBelongsTo($class)
+            ->where('class_code', $section)
+            ->with('worksheetClass:id,name,slug')
+            ->first();
+
+        if ($sectionModel === null) {
+            throw new NotFoundHttpException;
+        }
+
+        $this->authorize('view', $sectionModel);
+
+        return Inertia::render('Sections/Show', [
+            'worksheetClass' => [
+                'id' => $class->id,
+                'name' => $class->name,
+                'slug' => $class->slug,
+            ],
+            'section' => $this->sectionPayload($sectionModel),
+            'students' => [],
+        ]);
+    }
+
+    /**
      * @return list<array{id: int, name: string, email: string}>
      */
     private function reviewMasters(): array

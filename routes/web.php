@@ -22,6 +22,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('sections.store');
     Route::get('sections/{worksheetClass}', [SectionController::class, 'showClass'])
         ->name('sections.show-class');
+    Route::get('sections/{worksheetClass}/{section}', [SectionController::class, 'show'])
+        ->name('sections.show');
 });
 
 require __DIR__.'/settings.php';

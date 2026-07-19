@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Form, Head, setLayoutProps, usePage } from '@inertiajs/vue3';
-import { Plus, Users } from '@lucide/vue';
+import { Form, Head, Link, setLayoutProps, usePage } from '@inertiajs/vue3';
+import { ChevronRight, Plus, Users } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import { store } from '@/actions/App/Http/Controllers/SectionController';
 import InputError from '@/components/InputError.vue';
@@ -18,7 +18,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { showClass as sectionClassRoute } from '@/routes/sections';
+import {
+    show as sectionShow,
+    showClass as sectionClassRoute,
+} from '@/routes/sections';
 
 type WorksheetClassItem = {
     id: number;
@@ -262,46 +265,59 @@ function formatDate(date: string): string {
             class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
         >
             <div
-                class="grid grid-cols-[minmax(0,1fr)_auto_11rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem] dark:border-sidebar-border"
+                class="grid grid-cols-[minmax(0,1fr)_auto_11rem_1rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem_1rem] dark:border-sidebar-border"
             >
                 <span>Name</span>
                 <span>Type</span>
                 <span>Code</span>
                 <span class="hidden sm:block">Start</span>
                 <span class="hidden sm:block">End</span>
+                <span class="sr-only">Open</span>
             </div>
 
             <ul
                 class="divide-y divide-sidebar-border/70 dark:divide-sidebar-border"
             >
-                <li
-                    v-for="section in sections"
-                    :key="section.id"
-                    class="grid grid-cols-[minmax(0,1fr)_auto_11rem] gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem]"
-                >
-                    <div class="min-w-0">
-                        <p class="truncate font-medium">{{ section.name }}</p>
-                        <p class="text-muted-foreground sm:hidden">
-                            {{ formatDate(section.date_start) }} –
+                <li v-for="section in sections" :key="section.id">
+                    <Link
+                        :href="
+                            sectionShow({
+                                worksheetClass: worksheetClass.slug,
+                                section: section.class_code,
+                            })
+                        "
+                        class="grid grid-cols-[minmax(0,1fr)_auto_11rem_auto] gap-x-4 gap-y-1 px-4 py-3 text-sm transition-colors hover:bg-muted/50 sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem_auto]"
+                        prefetch
+                    >
+                        <div class="min-w-0">
+                            <p class="truncate font-medium">
+                                {{ section.name }}
+                            </p>
+                            <p class="text-muted-foreground sm:hidden">
+                                {{ formatDate(section.date_start) }} –
+                                {{ formatDate(section.date_end) }}
+                            </p>
+                        </div>
+                        <span class="truncate text-muted-foreground">
+                            {{ section.section_type }}
+                        </span>
+                        <span class="font-medium tabular-nums">
+                            {{ section.class_code }}
+                        </span>
+                        <span
+                            class="hidden whitespace-nowrap text-muted-foreground sm:block"
+                        >
+                            {{ formatDate(section.date_start) }}
+                        </span>
+                        <span
+                            class="hidden whitespace-nowrap text-muted-foreground sm:block"
+                        >
                             {{ formatDate(section.date_end) }}
-                        </p>
-                    </div>
-                    <span class="truncate text-muted-foreground">
-                        {{ section.section_type }}
-                    </span>
-                    <span class="font-medium tabular-nums">
-                        {{ section.class_code }}
-                    </span>
-                    <span
-                        class="hidden whitespace-nowrap text-muted-foreground sm:block"
-                    >
-                        {{ formatDate(section.date_start) }}
-                    </span>
-                    <span
-                        class="hidden whitespace-nowrap text-muted-foreground sm:block"
-                    >
-                        {{ formatDate(section.date_end) }}
-                    </span>
+                        </span>
+                        <ChevronRight
+                            class="size-4 shrink-0 self-center text-muted-foreground"
+                        />
+                    </Link>
                 </li>
             </ul>
         </div>

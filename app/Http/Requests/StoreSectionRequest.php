@@ -28,6 +28,7 @@ class StoreSectionRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'section_type' => ['required', 'string'],
             'worksheet_class_id' => ['required', 'integer', 'exists:worksheet_classes,id'],
             'class_code' => [
                 'required',

@@ -29,6 +29,7 @@ type WorksheetClassItem = {
 type SectionItem = {
     id: number;
     name: string;
+    section_type: string;
     class_code: string;
     date_start: string;
     date_end: string;
@@ -153,6 +154,17 @@ function formatDate(date: string): string {
                             </div>
 
                             <div class="grid gap-2">
+                                <Label for="section_type">Section type</Label>
+                                <Input
+                                    id="section_type"
+                                    name="section_type"
+                                    required
+                                    placeholder="Online, F2F, etc."
+                                />
+                                <InputError :message="errors.section_type" />
+                            </div>
+
+                            <div class="grid gap-2">
                                 <Label for="class_code">Class code</Label>
                                 <Input
                                     id="class_code"
@@ -250,9 +262,10 @@ function formatDate(date: string): string {
             class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
         >
             <div
-                class="grid grid-cols-[minmax(0,1fr)_11rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1fr)_12rem_7.5rem_7.5rem] dark:border-sidebar-border"
+                class="grid grid-cols-[minmax(0,1fr)_auto_11rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem] dark:border-sidebar-border"
             >
                 <span>Name</span>
+                <span>Type</span>
                 <span>Code</span>
                 <span class="hidden sm:block">Start</span>
                 <span class="hidden sm:block">End</span>
@@ -264,7 +277,7 @@ function formatDate(date: string): string {
                 <li
                     v-for="section in sections"
                     :key="section.id"
-                    class="grid grid-cols-[minmax(0,1fr)_11rem] gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_12rem_7.5rem_7.5rem]"
+                    class="grid grid-cols-[minmax(0,1fr)_auto_11rem] gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_8rem_12rem_7.5rem_7.5rem]"
                 >
                     <div class="min-w-0">
                         <p class="truncate font-medium">{{ section.name }}</p>
@@ -273,6 +286,9 @@ function formatDate(date: string): string {
                             {{ formatDate(section.date_end) }}
                         </p>
                     </div>
+                    <span class="truncate text-muted-foreground">
+                        {{ section.section_type }}
+                    </span>
                     <span class="font-medium tabular-nums">
                         {{ section.class_code }}
                     </span>

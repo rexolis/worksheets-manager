@@ -24,6 +24,7 @@ class SectionFactory extends Factory
 
         return [
             'name' => fake()->unique()->words(2, true),
+            'section_type' => fake()->randomElement(['Regular', 'Intensive', 'Review']),
             'worksheet_class_id' => WorksheetClass::factory(),
             'class_code' => fn (array $attributes): string => $this->classCode($attributes),
             'date_start' => $dateStart,

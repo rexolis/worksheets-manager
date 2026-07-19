@@ -126,6 +126,7 @@ class SectionController extends Controller
      * @return array{
      *     id: int,
      *     name: string,
+     *     section_type: string,
      *     class_code: string,
      *     date_start: string,
      *     date_end: string,
@@ -137,6 +138,7 @@ class SectionController extends Controller
         return [
             'id' => $section->id,
             'name' => $section->name,
+            'section_type' => $section->section_type,
             'class_code' => $section->class_code,
             'date_start' => $section->date_start->toDateString(),
             'date_end' => $section->date_end->toDateString(),

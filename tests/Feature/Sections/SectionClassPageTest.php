@@ -23,6 +23,7 @@ test('authenticated admins can visit a section class page and see its sections',
 
     Section::factory()->create([
         'name' => 'Morning Batch A',
+        'section_type' => 'Online',
         'worksheet_class_id' => 1,
         'class_code' => '202601-CSE-A',
         'date_start' => '2026-01-15',
@@ -43,6 +44,7 @@ test('authenticated admins can visit a section class page and see its sections',
             ->where('worksheetClass.name', 'Civil Service Examination')
             ->has('sections', 1)
             ->where('sections.0.name', 'Morning Batch A')
+            ->where('sections.0.section_type', 'Online')
             ->where('sections.0.class_code', '202601-CSE-A'),
         );
 });

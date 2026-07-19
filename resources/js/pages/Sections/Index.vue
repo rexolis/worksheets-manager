@@ -11,6 +11,7 @@ type WorksheetClassItem = {
 type SectionItem = {
     id: number;
     name: string;
+    section_type: string;
     class_code: string;
     date_start: string;
     date_end: string;
@@ -91,6 +92,9 @@ function formatDate(date: string): string {
                 >
                     <div class="min-w-0">
                         <p class="truncate font-medium">{{ section.name }}</p>
+                        <p class="truncate text-muted-foreground">
+                            {{ section.section_type }}
+                        </p>
                         <p class="truncate text-muted-foreground sm:hidden">
                             {{ section.worksheet_class.name }}
                         </p>

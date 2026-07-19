@@ -11,6 +11,7 @@ test('guests cannot store sections', function () {
 
     $this->post(route('sections.store'), [
         'name' => 'Morning Batch A',
+        'section_type' => 'Regular',
         'worksheet_class_id' => 1,
         'class_code' => '202601-CSE-A',
         'date_start' => '2026-01-15',
@@ -29,6 +30,7 @@ test('admins can store a section and are redirected to the class page', function
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202601-CSE-A',
             'date_start' => '2026-01-15',
@@ -40,9 +42,31 @@ test('admins can store a section and are redirected to the class page', function
 
     expect($section)->not->toBeNull()
         ->and($section->name)->toBe('Morning Batch A')
+        ->and($section->section_type)->toBe('Regular')
         ->and($section->worksheet_class_id)->toBe(1)
         ->and($section->date_start->toDateString())->toBe('2026-01-15')
         ->and($section->date_end->toDateString())->toBe('2026-06-15');
+});
+
+test('storing a section requires a section type', function () {
+    $this->seed([
+        RoleSeeder::class,
+        WorksheetClassSeeder::class,
+    ]);
+
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->post(route('sections.store'), [
+            'name' => 'Morning Batch A',
+            'worksheet_class_id' => 1,
+            'class_code' => '202601-CSE-A',
+            'date_start' => '2026-01-15',
+            'date_end' => '2026-06-15',
+        ])
+        ->assertSessionHasErrors('section_type');
+
+    expect(Section::query()->count())->toBe(0);
 });
 
 test('teachers cannot store sections', function () {
@@ -56,6 +80,7 @@ test('teachers cannot store sections', function () {
     $this->actingAs($teacher)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202601-CSE-A',
             'date_start' => '2026-01-15',
@@ -77,6 +102,7 @@ test('storing a section requires a valid class code format for the class and sta
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => 'CSE-AM-A',
             'date_start' => '2026-01-15',
@@ -87,6 +113,7 @@ test('storing a section requires a valid class code format for the class and sta
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202602-CSE-A',
             'date_start' => '2026-01-15',
@@ -113,6 +140,7 @@ test('class codes must be unique', function () {
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Another Section',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202601-CSE-A',
             'date_start' => '2026-01-15',
@@ -134,6 +162,7 @@ test('admins can assign review masters when storing a section', function () {
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202601-CSE-A',
             'date_start' => '2026-01-15',
@@ -162,6 +191,7 @@ test('non-teacher users cannot be assigned as review masters', function () {
     $this->actingAs($admin)
         ->post(route('sections.store'), [
             'name' => 'Morning Batch A',
+            'section_type' => 'Regular',
             'worksheet_class_id' => 1,
             'class_code' => '202601-CSE-A',
             'date_start' => '2026-01-15',

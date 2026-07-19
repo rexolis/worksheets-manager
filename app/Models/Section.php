@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
+ * @property string $section_type
  * @property int $worksheet_class_id
  * @property string $class_code
  * @property Carbon $date_start
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'name',
+    'section_type',
     'worksheet_class_id',
     'class_code',
     'date_start',

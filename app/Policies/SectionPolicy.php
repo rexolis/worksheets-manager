@@ -41,7 +41,17 @@ class SectionPolicy
      */
     public function update(User $user, Section $section): bool
     {
-        return false;
+        return $user->isAdmin() && ! $section->isDeleted();
+    }
+
+    /**
+     * Determine whether the user can archive the model.
+     */
+    public function archive(User $user, Section $section): bool
+    {
+        return $user->isAdmin()
+            && ! $section->isDeleted()
+            && ! $section->isArchived();
     }
 
     /**
@@ -49,7 +59,7 @@ class SectionPolicy
      */
     public function delete(User $user, Section $section): bool
     {
-        return false;
+        return $user->isAdmin() && ! $section->isDeleted();
     }
 
     /**

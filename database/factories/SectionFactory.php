@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\SectionStatusId;
 use App\Models\Section;
 use App\Models\WorksheetClass;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -29,7 +30,22 @@ class SectionFactory extends Factory
             'class_code' => fn (array $attributes): string => $this->classCode($attributes),
             'date_start' => $dateStart,
             'date_end' => $dateEnd,
+            'status' => SectionStatusId::Active,
         ];
+    }
+
+    public function archived(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => SectionStatusId::Archived,
+        ]);
+    }
+
+    public function deleted(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => SectionStatusId::Deleted,
+        ]);
     }
 
     /**

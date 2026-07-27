@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SectionStatusId;
 use App\Http\Requests\StoreSectionRequest;
+use App\Http\Requests\UpdateSectionRequest;
 use App\Models\Section;
 use App\Models\User;
 use App\Models\WorksheetClass;
@@ -24,7 +26,10 @@ class SectionController extends Controller
         $this->authorize('viewAny', Section::class);
 
         $sections = $this->sectionsFor($request)
-            ->with('worksheetClass:id,name,slug')
+            ->with([
+                'worksheetClass:id,name,slug',
+                'teachers:id',
+            ])
             ->orderBy('date_start')
             ->orderBy('name')
             ->get()
@@ -32,6 +37,9 @@ class SectionController extends Controller
 
         return Inertia::render('Sections/Index', [
             'sections' => $sections,
+            'teachers' => $request->user()->isAdmin()
+                ? $this->reviewMasters()
+                : [],
         ]);
     }
 
@@ -45,6 +53,58 @@ class SectionController extends Controller
 
         $section = Section::query()->create($validated);
         $section->teachers()->attach($teacherIds);
+
+        $section->load('worksheetClass:id,slug');
+
+        return to_route('sections.show-class', $section->worksheetClass->slug);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateSectionRequest $request, Section $section): RedirectResponse
+    {
+        if ($section->isDeleted()) {
+            throw new NotFoundHttpException;
+        }
+
+        $validated = $request->safe()->except(['teacher_ids']);
+        $teacherIds = $request->validated('teacher_ids') ?? [];
+
+        $section->update($validated);
+        $section->teachers()->sync($teacherIds);
+
+        $section->load('worksheetClass:id,slug');
+
+        return to_route('sections.show-class', $section->worksheetClass->slug);
+    }
+
+    /**
+     * Archive the specified section.
+     */
+    public function archive(Request $request, Section $section): RedirectResponse
+    {
+        $this->authorize('archive', $section);
+
+        $section->update([
+            'status' => SectionStatusId::Archived,
+        ]);
+
+        $section->load('worksheetClass:id,slug');
+
+        return to_route('sections.show-class', $section->worksheetClass->slug);
+    }
+
+    /**
+     * Soft-delete the specified section.
+     */
+    public function destroy(Section $section): RedirectResponse
+    {
+        $this->authorize('delete', $section);
+
+        $section->update([
+            'status' => SectionStatusId::Deleted,
+        ]);
 
         $section->load('worksheetClass:id,slug');
 
@@ -68,7 +128,10 @@ class SectionController extends Controller
 
         $sections = $this->sectionsFor($request)
             ->whereBelongsTo($class)
-            ->with('worksheetClass:id,name,slug')
+            ->with([
+                'worksheetClass:id,name,slug',
+                'teachers:id',
+            ])
             ->orderBy('date_start')
             ->orderBy('name')
             ->get()
@@ -103,7 +166,10 @@ class SectionController extends Controller
         $sectionModel = $this->sectionsFor($request)
             ->whereBelongsTo($class)
             ->where('class_code', $section)
-            ->with('worksheetClass:id,name,slug')
+            ->with([
+                'worksheetClass:id,name,slug',
+                'teachers:id',
+            ])
             ->first();
 
         if ($sectionModel === null) {
@@ -146,6 +212,7 @@ class SectionController extends Controller
     /**
      * Determine what sections the user can view.
      * An admin can view all sections, a teacher can view only their assigned sections.
+     * Soft-deleted sections are excluded; archived sections remain visible.
      *
      * @return Builder<Section>|BelongsToMany<Section, User>
      */
@@ -153,9 +220,11 @@ class SectionController extends Controller
     {
         $user = $request->user();
 
-        return $user->isAdmin()
+        $query = $user->isAdmin()
             ? Section::query()
             : $user->sections();
+
+        return $query->notDeleted();
     }
 
     /**
@@ -166,6 +235,8 @@ class SectionController extends Controller
      *     class_code: string,
      *     date_start: string,
      *     date_end: string,
+     *     status: string,
+     *     teacher_ids: list<int>,
      *     worksheet_class: array{id: int, name: string, slug: string}
      * }
      */
@@ -178,6 +249,10 @@ class SectionController extends Controller
             'class_code' => $section->class_code,
             'date_start' => $section->date_start->toDateString(),
             'date_end' => $section->date_end->toDateString(),
+            'status' => strtolower($section->status->name),
+            'teacher_ids' => $section->relationLoaded('teachers')
+                ? $section->teachers->pluck('id')->all()
+                : [],
             'worksheet_class' => [
                 'id' => $section->worksheetClass->id,
                 'name' => $section->worksheetClass->name,

@@ -20,6 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('sections');
     Route::post('sections', [SectionController::class, 'store'])
         ->name('sections.store');
+    Route::put('sections/{section}', [SectionController::class, 'update'])
+        ->name('sections.update');
+    Route::post('sections/{section}/archive', [SectionController::class, 'archive'])
+        ->name('sections.archive');
+    Route::delete('sections/{section}', [SectionController::class, 'destroy'])
+        ->name('sections.destroy');
     Route::get('sections/{worksheetClass}', [SectionController::class, 'showClass'])
         ->name('sections.show-class');
     Route::get('sections/{worksheetClass}/{section}', [SectionController::class, 'show'])

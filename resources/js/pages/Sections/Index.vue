@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ChevronRight, Users } from '@lucide/vue';
+import { computed } from 'vue';
+import SectionRowActions from '@/components/SectionRowActions.vue';
+import { Badge } from '@/components/ui/badge';
 import { show as sectionShow } from '@/routes/sections';
 
 type WorksheetClassItem = {
@@ -16,12 +19,24 @@ type SectionItem = {
     class_code: string;
     date_start: string;
     date_end: string;
+    status: string;
+    teacher_ids: number[];
     worksheet_class: WorksheetClassItem;
+};
+
+type TeacherItem = {
+    id: number;
+    name: string;
+    email: string;
 };
 
 defineProps<{
     sections: SectionItem[];
+    teachers: TeacherItem[];
 }>();
+
+const page = usePage();
+const isAdmin = computed(() => page.props.auth.user?.is_admin === true);
 
 defineOptions({
     layout: {
@@ -74,7 +89,12 @@ function formatDate(date: string): string {
             class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
         >
             <div
-                class="grid grid-cols-[minmax(0,1fr)_11rem_1rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_1rem] dark:border-sidebar-border"
+                class="grid gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground dark:border-sidebar-border"
+                :class="
+                    isAdmin
+                        ? 'grid-cols-[minmax(0,1fr)_11rem_6.5rem] sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_1rem_6.5rem]'
+                        : 'grid-cols-[minmax(0,1fr)_11rem_1rem] sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_1rem]'
+                "
             >
                 <span>Name</span>
                 <span class="hidden sm:block">Class type</span>
@@ -82,12 +102,22 @@ function formatDate(date: string): string {
                 <span class="hidden sm:block">Start</span>
                 <span class="hidden sm:block">End</span>
                 <span class="sr-only">Open</span>
+                <span v-if="isAdmin" class="text-right">Actions</span>
             </div>
 
             <ul
                 class="divide-y divide-sidebar-border/70 dark:divide-sidebar-border"
             >
-                <li v-for="section in sections" :key="section.id">
+                <li
+                    v-for="section in sections"
+                    :key="section.id"
+                    class="grid items-center gap-x-4 gap-y-1 px-4 py-3 text-sm transition-colors hover:bg-muted/50"
+                    :class="
+                        isAdmin
+                            ? 'grid-cols-[minmax(0,1fr)_11rem_6.5rem] sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_1rem_6.5rem]'
+                            : 'grid-cols-[minmax(0,1fr)_11rem_auto] sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_auto]'
+                    "
+                >
                     <Link
                         :href="
                             sectionShow({
@@ -95,13 +125,21 @@ function formatDate(date: string): string {
                                 section: section.class_code,
                             })
                         "
-                        class="grid grid-cols-[minmax(0,1fr)_11rem_auto] gap-x-4 gap-y-1 px-4 py-3 text-sm transition-colors hover:bg-muted/50 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.5fr)_12rem_7.5rem_7.5rem_auto]"
+                        class="contents"
                         prefetch
                     >
                         <div class="min-w-0">
-                            <p class="truncate font-medium">
-                                {{ section.name }}
-                            </p>
+                            <div class="flex min-w-0 items-center gap-2">
+                                <p class="truncate font-medium">
+                                    {{ section.name }}
+                                </p>
+                                <Badge
+                                    v-if="section.status === 'archived'"
+                                    variant="secondary"
+                                >
+                                    Archived
+                                </Badge>
+                            </div>
                             <p class="truncate text-muted-foreground">
                                 {{ section.section_type }}
                             </p>
@@ -137,6 +175,12 @@ function formatDate(date: string): string {
                             class="size-4 shrink-0 self-center text-muted-foreground"
                         />
                     </Link>
+
+                    <SectionRowActions
+                        v-if="isAdmin"
+                        :section="section"
+                        :teachers="teachers"
+                    />
                 </li>
             </ul>
         </div>

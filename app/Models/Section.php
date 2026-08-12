@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\SectionStatusId;
 use Database\Factories\SectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $class_code
  * @property Carbon $date_start
  * @property Carbon $date_end
+ * @property SectionStatusId $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -28,11 +31,19 @@ use Illuminate\Support\Carbon;
     'class_code',
     'date_start',
     'date_end',
+    'status',
 ])]
 class Section extends Model
 {
     /** @use HasFactory<SectionFactory> */
     use HasFactory;
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => SectionStatusId::Active->value,
+    ];
 
     /**
      * @return array<string, string>
@@ -42,7 +53,27 @@ class Section extends Model
         return [
             'date_start' => 'date',
             'date_end' => 'date',
+            'status' => SectionStatusId::class,
         ];
+    }
+
+    /**
+     * @param  Builder<Section>  $query
+     * @return Builder<Section>
+     */
+    public function scopeNotDeleted(Builder $query): Builder
+    {
+        return $query->where('status', '!=', SectionStatusId::Deleted);
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->status === SectionStatusId::Archived;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->status === SectionStatusId::Deleted;
     }
 
     public function worksheetClass(): BelongsTo

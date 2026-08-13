@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Head, setLayoutProps } from '@inertiajs/vue3';
-import { GraduationCap } from '@lucide/vue';
+import { Head, Link, setLayoutProps } from '@inertiajs/vue3';
+import { ArrowLeft, GraduationCap } from '@lucide/vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     show as sectionShow,
     showClass as sectionClassRoute,
@@ -26,6 +28,7 @@ type StudentItem = {
     id: number;
     name: string;
     email: string;
+    status: 'pending' | 'approved';
 };
 
 const props = defineProps<{
@@ -60,22 +63,35 @@ function formatDate(date: string): string {
         day: 'numeric',
     });
 }
+
+function statusLabel(status: StudentItem['status']): string {
+    return status === 'approved' ? 'Approved' : 'Pending';
+}
 </script>
 
 <template>
     <Head :title="`${section.name} · ${worksheetClass.name}`" />
 
     <div class="flex h-full flex-1 flex-col gap-6 p-4">
-        <div class="space-y-1">
-            <p class="text-sm text-muted-foreground">
-                {{ worksheetClass.name }}
-            </p>
-            <h1 class="text-xl font-semibold">{{ section.name }}</h1>
-            <p class="text-sm text-muted-foreground">
-                {{ section.section_type }} · {{ section.class_code }} ·
-                {{ formatDate(section.date_start) }} –
-                {{ formatDate(section.date_end) }}
-            </p>
+        <div class="flex items-start gap-3">
+            <Button variant="outline" size="icon" class="shrink-0" as-child>
+                <Link :href="sectionClassRoute(worksheetClass.slug)">
+                    <ArrowLeft class="size-4" />
+                    <span class="sr-only">Back</span>
+                </Link>
+            </Button>
+
+            <div class="min-w-0 flex-1 space-y-1">
+                <p class="text-sm text-muted-foreground">
+                    {{ worksheetClass.name }}
+                </p>
+                <h1 class="text-xl font-semibold">{{ section.name }}</h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ section.section_type }} · {{ section.class_code }} ·
+                    {{ formatDate(section.date_start) }} –
+                    {{ formatDate(section.date_end) }}
+                </p>
+            </div>
         </div>
 
         <div class="space-y-3">
@@ -102,10 +118,11 @@ function formatDate(date: string): string {
                 class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
             >
                 <div
-                    class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground dark:border-sidebar-border"
+                    class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_6.5rem] gap-x-4 border-b border-sidebar-border/70 px-4 py-2 text-xs font-medium text-muted-foreground dark:border-sidebar-border"
                 >
                     <span>Name</span>
                     <span>Email</span>
+                    <span>Status</span>
                 </div>
 
                 <ul
@@ -114,7 +131,7 @@ function formatDate(date: string): string {
                     <li
                         v-for="student in students"
                         :key="student.id"
-                        class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-4 px-4 py-3 text-sm"
+                        class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_6.5rem] gap-x-4 px-4 py-3 text-sm"
                     >
                         <span class="truncate font-medium">{{
                             student.name
@@ -122,6 +139,17 @@ function formatDate(date: string): string {
                         <span class="truncate text-muted-foreground">{{
                             student.email
                         }}</span>
+                        <div>
+                            <Badge
+                                :variant="
+                                    student.status === 'approved'
+                                        ? 'default'
+                                        : 'secondary'
+                                "
+                            >
+                                {{ statusLabel(student.status) }}
+                            </Badge>
+                        </div>
                     </li>
                 </ul>
             </div>

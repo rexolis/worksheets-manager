@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -84,6 +85,18 @@ class Section extends Model
     public function teachers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'review_masters')
+            ->withTimestamps();
+    }
+
+    public function studentClasses(): HasMany
+    {
+        return $this->hasMany(StudentClass::class);
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'student_class')
+            ->withPivot('status')
             ->withTimestamps();
     }
 }

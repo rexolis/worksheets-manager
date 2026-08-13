@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\SectionStatusId;
 use App\Enums\StudentClassStatus;
+use App\Models\StudentClass;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -68,15 +69,13 @@ class StudentClassSeeder extends Seeder
                     ],
                 );
 
-                DB::table('student_class')->updateOrInsert(
+                StudentClass::query()->updateOrCreate(
                     [
                         'user_id' => $user->id,
                         'section_id' => $sectionId,
                     ],
                     [
-                        'status' => StudentClassStatus::Approved->value,
-                        'created_at' => $timestamp,
-                        'updated_at' => $timestamp,
+                        'status' => StudentClassStatus::Approved,
                     ],
                 );
             }

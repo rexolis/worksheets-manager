@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Section;
+use App\Models\StudentClass;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\WorksheetClassSeeder;
@@ -20,21 +21,38 @@ test('guests are redirected to the login page from a section show page', functio
     ]))->assertRedirect(route('login'));
 });
 
-test('admins can visit a section show page with an empty students placeholder', function () {
+test('admins can visit a section show page and see enrolled students', function () {
     $this->seed([
         RoleSeeder::class,
         WorksheetClassSeeder::class,
     ]);
 
     $admin = User::factory()->admin()->create();
+    $student = User::factory()->create([
+        'name' => 'Avery Chen',
+        'email' => 'avery.chen@example.com',
+    ]);
 
-    Section::factory()->create([
+    $section = Section::factory()->create([
         'name' => 'Morning Batch A',
         'section_type' => 'Online',
         'worksheet_class_id' => 1,
         'class_code' => '202601-CSE-A',
         'date_start' => '2026-01-15',
         'date_end' => '2026-06-15',
+    ]);
+
+    StudentClass::factory()->approved()->create([
+        'user_id' => $student->id,
+        'section_id' => $section->id,
+    ]);
+    StudentClass::factory()->pending()->create([
+        'user_id' => User::factory()->create(['name' => 'Jordan Blake'])->id,
+        'section_id' => $section->id,
+    ]);
+    StudentClass::factory()->denied()->create([
+        'user_id' => User::factory()->create()->id,
+        'section_id' => $section->id,
     ]);
 
     $this->actingAs($admin)
@@ -49,7 +67,11 @@ test('admins can visit a section show page with an empty students placeholder', 
             ->where('section.name', 'Morning Batch A')
             ->where('section.section_type', 'Online')
             ->where('section.class_code', '202601-CSE-A')
-            ->has('students', 0),
+            ->has('students', 2)
+            ->where('students.0.name', 'Avery Chen')
+            ->where('students.0.status', 'approved')
+            ->where('students.1.name', 'Jordan Blake')
+            ->where('students.1.status', 'pending'),
         );
 });
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, setLayoutProps } from '@inertiajs/vue3';
-import { BookCheck } from '@lucide/vue';
+import { Head, Link, setLayoutProps } from '@inertiajs/vue3';
+import { ArrowLeft, BookCheck } from '@lucide/vue';
+import { Button } from '@/components/ui/button';
 import {
     showClass as worksheetClassRoute,
     subject as worksheetSubject,
@@ -49,15 +50,24 @@ setLayoutProps({
     <Head :title="`${worksheetClass.name} · ${subject.name}`" />
 
     <div class="flex h-full flex-1 flex-col gap-6 p-4">
-        <div class="space-y-1">
-            <p class="text-sm text-muted-foreground">
-                {{ worksheetClass.name }}
-            </p>
-            <h1 class="text-xl font-semibold">{{ subject.name }}</h1>
-            <p class="text-sm text-muted-foreground">
-                {{ worksheets.length }}
-                {{ worksheets.length === 1 ? 'worksheet' : 'worksheets' }}
-            </p>
+        <div class="flex items-start gap-3">
+            <Button variant="outline" size="icon" class="shrink-0" as-child>
+                <Link :href="worksheetClassRoute(worksheetClass.slug)">
+                    <ArrowLeft class="size-4" />
+                    <span class="sr-only">Back</span>
+                </Link>
+            </Button>
+
+            <div class="min-w-0 flex-1 space-y-1">
+                <p class="text-sm text-muted-foreground">
+                    {{ worksheetClass.name }}
+                </p>
+                <h1 class="text-xl font-semibold">{{ subject.name }}</h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ worksheets.length }}
+                    {{ worksheets.length === 1 ? 'worksheet' : 'worksheets' }}
+                </p>
+            </div>
         </div>
 
         <div

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, BookCheck, Users } from '@lucide/vue';
+import { LayoutGrid, BookCheck, BookOpen, Users } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -16,13 +16,19 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { dashboard, sections, worksheets } from '@/routes';
+import { classes, dashboard, sections, worksheets } from '@/routes';
 import { showClass as sectionClass } from '@/routes/sections';
 import { showClass as worksheetClass } from '@/routes/worksheets';
 import type { NavItem } from '@/types';
 
 const page = usePage();
 const { isCurrentOrParentUrl } = useCurrentUrl();
+
+const isAdmin = computed(() => page.props.auth.user?.is_admin === true);
+const isTeacher = computed(() => page.props.auth.user?.is_teacher === true);
+const isRegularUser = computed(
+    () => !isAdmin.value && !isTeacher.value && page.props.auth.user != null,
+);
 
 const mainNavItems = computed((): NavItem[] => {
     const items: NavItem[] = [
@@ -33,7 +39,7 @@ const mainNavItems = computed((): NavItem[] => {
         },
     ];
 
-    if (page.props.auth.user?.is_admin) {
+    if (isAdmin.value) {
         items.push({
             title: 'Worksheets',
             icon: BookCheck,
@@ -45,7 +51,7 @@ const mainNavItems = computed((): NavItem[] => {
         });
     }
 
-    if (page.props.auth.user?.is_admin || page.props.auth.user?.is_teacher) {
+    if (isAdmin.value || isTeacher.value) {
         items.push({
             title: 'Sections',
             icon: Users,
@@ -54,6 +60,14 @@ const mainNavItems = computed((): NavItem[] => {
                 title: worksheetClassItem.name,
                 href: sectionClass(worksheetClassItem.slug),
             })),
+        });
+    }
+
+    if (isRegularUser.value) {
+        items.push({
+            title: 'Classes',
+            href: classes(),
+            icon: BookOpen,
         });
     }
 

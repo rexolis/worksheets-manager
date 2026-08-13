@@ -63,6 +63,18 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function studentClasses(): HasMany
+    {
+        return $this->hasMany(StudentClass::class);
+    }
+
+    public function enrolledSections(): BelongsToMany
+    {
+        return $this->belongsToMany(Section::class, 'student_class')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');

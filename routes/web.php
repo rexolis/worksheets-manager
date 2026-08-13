@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\WorksheetController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('worksheets.show-class');
     Route::get('worksheets/{worksheetClass}/{subject}', [WorksheetController::class, 'subject'])
         ->name('worksheets.subject');
+
+    Route::get('classes', [StudentClassController::class, 'index'])
+        ->name('classes');
+    Route::post('classes', [StudentClassController::class, 'store'])
+        ->name('classes.store');
 
     Route::get('sections', [SectionController::class, 'index'])
         ->name('sections');

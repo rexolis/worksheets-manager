@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SectionStatusId;
+use App\Enums\StudentClassStatus;
 use App\Http\Requests\StoreSectionRequest;
 use App\Http\Requests\UpdateSectionRequest;
 use App\Models\Section;
@@ -178,6 +179,23 @@ class SectionController extends Controller
 
         $this->authorize('view', $sectionModel);
 
+        $students = $sectionModel->studentClasses()
+            ->whereIn('status', [
+                StudentClassStatus::Pending,
+                StudentClassStatus::Approved,
+            ])
+            ->with('user:id,name,email')
+            ->get()
+            ->sortBy(fn ($enrollment) => $enrollment->user->name)
+            ->values()
+            ->map(fn ($enrollment) => [
+                'id' => $enrollment->user->id,
+                'name' => $enrollment->user->name,
+                'email' => $enrollment->user->email,
+                'status' => $enrollment->status->value,
+            ])
+            ->all();
+
         return Inertia::render('Sections/Show', [
             'worksheetClass' => [
                 'id' => $class->id,
@@ -185,7 +203,7 @@ class SectionController extends Controller
                 'slug' => $class->slug,
             ],
             'section' => $this->sectionPayload($sectionModel),
-            'students' => [],
+            'students' => $students,
         ]);
     }
 
